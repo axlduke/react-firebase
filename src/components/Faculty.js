@@ -129,26 +129,6 @@ const Faculty = () => {
     //     );
     // }, [data, searchTerm]);
 
-    // const pageCount = Math.ceil(filteredData.length / dataLimit);
-
-    // const paginatedData = useMemo(() => {
-    //     const startIndex = (currentPage - 1) * dataLimit;
-    //     return filteredData.slice(startIndex, startIndex + dataLimit);
-    // }, [currentPage, dataLimit, filteredData]);
-
-    // const handlePageClick = (event) => {
-    //     setCurrentPage(Number(event.target.id));
-    // };
-
-    // const handleLimitChange = (event) => {
-    //     setDataLimit(Number(event.target.value));
-    //     setCurrentPage(1);
-    // };
-
-    // const handleSearch = (event) => {
-    //     setSearchTerm(event.target.value);
-    //     setCurrentPage(1);
-    // };
     const actionColumn = [
         {
             field: "action",
