@@ -102,11 +102,11 @@ const Home = () => {
                         <img 
                             src={wall} 
                             alt='oscs'
-                            className='w-96 h-52 lg:w-[985px] lg:h-72 rounded-lg shadow-lg'    
+                            className='w-96 h-52 lg:w-[985px] 2xl:w-[1200px] lg:h-72 rounded-lg shadow-lg'    
                         />
                     </div>
                     <div className='flex flex-col lg:flex-row gap-3 2xl:flex-row'>
-                        <div className='w-96 lg:w-80 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
+                        <div className='w-96 lg:w-80 2xl:w-96 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
                             <div className='flex justify-center my-5 items-center flex-row gap-5'>
                                 <div className='bg-[#EDF1FA] p-2 rounded-full'>
                                     <FaUsers className='text-4xl text-[#7551FF]'/>
@@ -117,7 +117,7 @@ const Home = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className='w-96 lg:w-80 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
+                        <div className='w-96 lg:w-80 2xl:w-96 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
                             <div className='flex justify-center my-5 items-center flex-row gap-5'>
                                 <div className='bg-[#EDF1FA] p-2 rounded-full'>
                                     <FaUserGraduate className='text-4xl text-[#7551FF]'/>
@@ -128,7 +128,7 @@ const Home = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className='w-96 lg:w-80 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
+                        <div className='w-96 lg:w-80 2xl:w-96 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
                             <div className='flex justify-center my-5 items-center flex-row gap-5'>
                                 <div className='bg-[#EDF1FA] p-2 rounded-full'>
                                     <BsNewspaper className='text-4xl text-[#7551FF]'/>

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import classNames from 'classnames'
 import { HiOutlineHome } from 'react-icons/hi'
 import { BsNewspaper } from 'react-icons/bs'
 import { FaUsers, FaUserGraduate, FaBars } from 'react-icons/fa'
 import { IoIosLogOut, IoIosClose } from 'react-icons/io'
 import '../assets/Scrollbar.css'
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, deleteDoc, getDocs, doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'
 import { DataGrid } from "@mui/x-data-grid"
 import { Link } from "react-router-dom"
@@ -25,24 +25,43 @@ const Faculty = () => {
     const [ data, setData ] = useState([])
 
     useEffect(() => {
-        const fetchData = async () => {
+        // const fetchData = async () => {
+        //     let list = []
+        //     try {
+        //         const querySnapshot = await getDocs(collection(db, 'faculty'))
+        //         querySnapshot.forEach((doc) => {
+        //             list.push({ id: doc.id, ...doc.data() })
+        //         })
+        //         setData(list)
+        //     } catch(err) {
+        //         console.log(err)
+        //     }
+        // }
+        // fetchData()
+        const unsub = onSnapshot(collection(db, 'faculty'), (snapShot) =>{
             let list = []
-            try {
-                const querySnapshot = await getDocs(collection(db, 'faculty'))
-                querySnapshot.forEach((doc) => {
-                    list.push(doc)
-                })
-                setData(list)
-            } catch(err) {
-                console.log(err)
+            snapShot.docs.forEach((doc) => {
+                list.push({ id: doc.id, ...doc.data() })
+            })
+            setData(list)
+        }, 
+            (error) => {
+                console.log(error)
             }
+        )
+        return () => {
+            unsub()
         }
-        fetchData()
     },[])
-    console.log(data)
+    // console.log(data)
 
-    const handleDelete = (id) => {
-        setData(data.filter((item) => item.id !== id))
+    const handleDelete = async(id) => {
+        try {
+            await deleteDoc(doc(db, 'faculty', id))
+            setData(data.filter((item) => item.id !== id))
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const [activeLink, setActiveLink] = useState('/faculty');
@@ -156,7 +175,25 @@ const Faculty = () => {
 
     return (
         <div className="my-scrollable-element bg-[#EDF1FA] h-screen flex flex-row">
-            <div className='fixed'>  
+            <div className='table -ml-72 2xl:-ml-0'>
+                <div className="datatable">
+                    <div className="datatableTitle">
+                        Add New Faculty Member
+                        <Link to="/faculty_add" className="link">
+                            Add New
+                        </Link>
+                    </div>
+                    <DataGrid
+                        className="datagrid"
+                        rows={data}
+                        columns={userColumns.concat(actionColumn)}
+                        pageSize={9}
+                        rowsPerPageOptions={[9]}
+                        checkboxSelection
+                    />
+                </div>
+            </div>
+            <div className='absolute lg:fixed 2xl:fixed'>  
                 <div className='fixed w-screen h-auto bg-black/50'>
                     <div className='flex items-center justify-between lg:justify-end 2xl:justify-end mx-5 my-5 lg:my-3 2xl:my-3'>
                         <div className='lg:hidden 2xl:hidden'  onClick={handleToggleSidebar}>
@@ -206,95 +243,6 @@ const Faculty = () => {
                     </div>
                 </div>
             </div>
-            <div className="datatable">
-                <div className="datatableTitle">
-                    Add New Faculty Member
-                    <Link to="/faculty_add" className="link">
-                        Add New
-                    </Link>
-                </div>
-                <DataGrid
-                    className="datagrid"
-                    rows={data}
-                    columns={userColumns.concat(actionColumn)}
-                    pageSize={9}
-                    rowsPerPageOptions={[9]}
-                    checkboxSelection
-                />
-            </div>
-            {/* <div className="lg:ml-[300px] mt-28 lg:mt-20 2xl:mt-20 mx-2 w-full lg:mx-0 lg:w-full 2xl:w-[1220px] h-fit bg-white rounded-b-lg shadow-md">
-                <div className="flex justify-between place-content-center">
-                    <h1 className="text-2xl font-bold my-5 2xl:ml-10 text-[#886aff]">Faculty Lists</h1>
-                    <button className='mr-5'>
-                        {add.map((links) => (
-                        <a  href={links.link}
-                            className='p-2 border-2 border-[#7551FF] rounded-md'
-                        >
-                            Add New Faculty
-                        </a>
-                        ))}
-                    </button>
-                </div>
-                <DataGrid
-                    className="datagrid border border-black"
-                    rows={data}
-                    columns={userColumns.concat(actionColumn)}
-                    pageSize={9}
-                    rowsPerPageOptions={[9]}
-                    checkboxSelection
-                />
-                <div className='flex justify-end justify-between mx-6 2xl:mx-10'>
-                    <input type="text" placeholder="Search" value={searchTerm} onChange={handleSearch} 
-                        className='w-72 p-2 border border-black outline-none rounded-md'
-                    />
-                    <select 
-                        value={dataLimit} 
-                        onChange={handleLimitChange}
-                        className='border border-black px-auto rounded-md'
-                    >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-                <table className='min-w-full table-auto overflow-x-auto mt-2'>
-                    <thead className='min-w-full table-auto'>
-                    {data.map((item) => (
-                        <tr key={item.id} className='bg-gray-200 text-[#886aff] uppercase text-sm leading-normal"'>
-                            <th className="py-3 px-6 text-left">{item.name}</th>
-                        </tr>
-                    ))}
-                        <tr className='bg-gray-200 text-[#886aff] uppercase text-sm leading-normal"'>
-                            <th className="py-3 px-6 text-left">Name</th>
-                            <th className="py-3 px-6 text-left">Subject</th>
-                            <th className="py-3 px-6 text-left">Faculty</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className="border-b border-gray-200 hover:bg-gray-100">
-                            <td className="py-3 px-3 text-left ">{data}</td>
-                        </tr>
-                        {paginatedData.map((item, index) => (
-                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-100">
-                            {Object.values(item).map((value, index) => (
-                                <td key={index} className="py-3 px-3 text-left ">{value}</td>
-                            ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className='my-5 ml-10'>
-                    {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
-                        <button 
-                            key={page} 
-                            id={page} 
-                            onClick={handlePageClick}
-                            className='border border-indigo-200 w-10 p-1'>
-                            {page}
-                        </button>
-                    ))}
-                </div>
-            </div> */}
         </div>
     )
 }

@@ -1,38 +1,38 @@
 export const userColumns = [
     { field: "id", headerName: "ID", width: 100 },
         {
-        field: "username",
-        headerName: "Name",
+        field: "name",
+        headerName: "Full Name",
         width: 250,
         renderCell: (params) => {
             return (
             <div className="cellWithImg">
                 <img className="cellImg" src={params.row.img} alt="" />
-                {params.row.username}
+                {params.row.name}
             </div>
             );
         },
         },
-        // {
-        // field: "address",
-        // headerName: "address",
-        // width: 200,
-        // },
         {
         field: "address",
-        headerName: "ID",
+        headerName: "address",
         width: 200,
         },
         // {
-        // field: "monday",
-        // headerName: "Monday",
-        // width: 100,
+        // field: "address",
+        // headerName: "ID",
+        // width: 200,
         // },
-        // {
-        // field: "tuesday",
-        // headerName: "Tuesday",
-        // width: 100,
-        // },
+        {
+        field: "monday",
+        headerName: "Monday",
+        width: 100,
+        },
+        {
+        field: "tuesday",
+        headerName: "Tuesday",
+        width: 100,
+        },
         // {
         // field: "wednesday",
         // headerName: "Wednesday",

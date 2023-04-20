@@ -12,6 +12,7 @@ import { doc, serverTimestamp, setDoc, addDoc, collection, docRef
 import { auth, db, storage } from '../firebase'
 // import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
+import { useNavigate } from 'react-router-dom'
 
 const links = [
     { name: 'Dashboard', icon: <HiOutlineHome />, link: '/' },
@@ -49,9 +50,10 @@ const FacultyAdd = () => {
     }, [isMobile])
 
     const [ data, setData ] = useState({})
-    const [ per, setPerc ] = useState(null)
-    // const [data, setData] = useState({ name: "", address: "", faculty: "" })
     const [ file, setFile ] = useState("")
+    const [ per, setPerc ] = useState(null)
+    const navigate = useNavigate()
+    // const [data, setData] = useState({ name: "", address: "", faculty: "" })
 
     useEffect(() => {
         const uploadFile = () => {
@@ -118,6 +120,7 @@ const FacultyAdd = () => {
                 ...data,
                 // timestamp: serverTimestamp(),
             });
+            navigate(-1)
             // const docRef = await addDoc(collection(db, "faculty"), {
             //     ...data,
             //     timestamp: serverTimestamp(),
