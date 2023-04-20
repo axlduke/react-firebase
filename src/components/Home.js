@@ -7,6 +7,8 @@ import { IoIosLogOut, IoIosClose } from 'react-icons/io'
 import MiniCalendar from './MiniCalendar'
 import wall from '../assets/wall.jpg'
 import '../assets/Scrollbar.css'
+import { db } from '../firebase'
+import { collection, getDocs, onSnapshot } from 'firebase/firestore'
 
 
 const links = [
@@ -21,6 +23,33 @@ const Home = () => {
 
     const [activeLink, setActiveLink] = useState('/home');
     const [isMobile, setIsMobile] = useState(false);
+    const [facultyCount, setFacultyCount] = useState(null);
+    const [studentCount, setStudentCount] = useState(null);
+    const [newsCount, setNewsCount] = useState(null);
+
+    useEffect(() => {
+        //it listen when theres is an update on the count every time theres new data coming it will listen
+        async function fetchTotalCount() {
+            const facultyRef = collection(db, 'faculty');
+            const studentRef = collection(db, 'student');
+            const newsRef = collection(db, 'news');
+            const [] = await Promise.all([
+                onSnapshot(facultyRef, (snap) => {
+                    const count = snap.size;
+                    setFacultyCount(count);
+                }),
+                onSnapshot(studentRef, (snap) => {
+                    const count = snap.size;
+                    setStudentCount(count);
+                }),
+                onSnapshot(newsRef, (snap) => {
+                    const count = snap.size;
+                    setNewsCount(count);
+                })
+            ]);
+        }
+        fetchTotalCount()
+    }, [])
 
     const handleLinkClick = (link) => {
         setActiveLink(link);
@@ -113,7 +142,7 @@ const Home = () => {
                                 </div>
                                 <div>
                                     <h1 className='font-bold text-slate-500'>Total Students</h1>
-                                    <span>300</span>
+                                    <span>{studentCount}</span>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +153,7 @@ const Home = () => {
                                 </div>
                                 <div>
                                     <h1 className='font-bold text-slate-500'>Faculty Department</h1>
-                                    <span>300</span>
+                                    <span>{facultyCount}</span>
                                 </div>
                             </div>
                         </div>
@@ -135,20 +164,19 @@ const Home = () => {
                                 </div>
                                 <div>
                                     <h1 className='font-bold text-slate-500'>New & Events</h1>
-                                    <span>300</span>
+                                    <span>{newsCount}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className='flex flex-col mt-2 lg:flex-row 2xl:flex-row gap-3 mb-10'>
-                        <div className='w-96 lg:w-96 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
+                        {/* <div className='w-96 lg:w-96 h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
                             <div className='flex justify-center my-5 items-center flex-row gap-5'>
                                 <div className=''>
-                                    {/* <PieChart/> */}
                                     PieChart
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                         <div className='w-96 lg:w-[400px] h-fit lg:mt-0 2xl:mt-0 bg-white rounded-lg shadow-md'>
                             <div className='flex justify-center my-5 items-center flex-row gap-5'>
                                 <div className=''>

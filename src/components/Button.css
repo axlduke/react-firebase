@@ -82,13 +82,11 @@ button:disabled{
     cursor: pointer;
 }
 
-@media only screen and (max-width: 460px){
+//@media only screen and (max-width: 460px){
     .datatable {
-        position: absolute;
-        width: 1240px;
+        width: 440px;
         height: 600px;
-        margin-top: 5rem;
-        margin-left: -100px;
+        margin-top: 1235rem;
     }
     .datatableTitle{
         font-size: 20px;
@@ -107,11 +105,11 @@ button:disabled{
 
 @media only screen and (max-width: 1360px){
     .datatable {
-        width: 90%;
+        width: 80%;
         height: 500px;
         padding: 14px;
         margin-top: 5rem;
-        margin-left: 18rem;
+        margin-left: 17.9rem;
     }
     
     ::-w::-webkit-scrollbar {

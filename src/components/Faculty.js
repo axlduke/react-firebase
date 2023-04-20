@@ -89,32 +89,6 @@ const Faculty = () => {
         }
     }, [isMobile])
 
-
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // const data = [
-    //     { id: 1, name: 'John Doe', email: 'johndoe@example.com' },
-    //     { id: 2, name: 'Jane Smith', email: 'janesmith@example.com' },
-    //     { id: 3, name: 'Bob Johnson', email: 'bobjohnson@example.com' },
-    //     { id: 4, name: 'Sarah Lee', email: 'sarahlee@example.com' },
-    //     { id: 5, name: 'Chris Brown', email: 'chrisbrown@example.com' },
-    //     { id: 6, name: 'Taylor Swift', email: 'taylorswift@example.com' },
-    //     { id: 7, name: 'Justin Bieber', email: 'justinbieber@example.com' },
-    //     { id: 8, name: 'Adele', email: 'adele@example.com' },
-    //     { id: 9, name: 'Ed Sheeran', email: 'edsheeran@example.com' },
-    //     { id: 10, name: 'Shawn Mendes', email: 'shawnmendes@example.com' },
-    //     { id: 11, name: 'Dua Lipa', email: 'dualipa@example.com' },
-    //     { id: 12, name: 'Bruno Mars', email: 'brunomars@example.com' },
-    //     { id: 13, name: 'Ariana Grande', email: 'arianagrande@example.com' },
-    //     { id: 14, name: 'Lady Gaga', email: 'ladygaga@example.com' },
-    //     { id: 15, name: 'Beyoncé', email: 'beyonce@example.com' },
-    //     { id: 16, name: 'Kanye West', email: 'kanyewest@example.com' },
-    //     { id: 17, name: 'Drake', email: 'drake@example.com' },
-    //     { id: 18, name: 'Nicki Minaj', email: 'nickiminaj@example.com' },
-    //     { id: 19, name: 'Rihanna', email: 'rihanna@example.com' },
-    //     { id: 20, name: 'Katy Perry', email: 'katyperry@example.com' },
-    // ]
-
     // const [currentPage, setCurrentPage] = useState(1);
     // const [dataLimit, setDataLimit] = useState(10);
     // const [searchTerm, setSearchTerm] = useState('');
@@ -155,24 +129,6 @@ const Faculty = () => {
 
     return (
         <div className="my-scrollable-element bg-[#EDF1FA] h-screen flex flex-row">
-            <div className='table -ml-72 2xl:-ml-0'>
-                <div className="datatable">
-                    <div className="datatableTitle">
-                        Add New Faculty Member
-                        <Link to="/faculty_add" className="link">
-                            Add New
-                        </Link>
-                    </div>
-                    <DataGrid
-                        className="datagrid"
-                        rows={data}
-                        columns={userColumns.concat(actionColumn)}
-                        pageSize={9}
-                        rowsPerPageOptions={[9]}
-                        checkboxSelection
-                    />
-                </div>
-            </div>
             <div className='absolute lg:fixed 2xl:fixed'>  
                 <div className='fixed w-screen h-auto bg-black/50'>
                     <div className='flex items-center justify-between lg:justify-end 2xl:justify-end mx-5 my-5 lg:my-3 2xl:my-3'>
@@ -221,6 +177,24 @@ const Faculty = () => {
                         </a>
                         ))}
                     </div>
+                </div>
+            </div>
+            <div className='table'>
+                <div className="datatable">
+                    <div className="datatableTitle">
+                        Add New Faculty Member
+                        <Link to="/faculty_add" className="link">
+                            Add New
+                        </Link>
+                    </div>
+                    <DataGrid
+                        className="datagrid"
+                        rows={data}
+                        columns={userColumns.concat(actionColumn)}
+                        pageSize={9}
+                        rowsPerPageOptions={[9]}
+                        checkboxSelection
+                    />
                 </div>
             </div>
         </div>
