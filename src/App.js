@@ -1,4 +1,3 @@
-import './App.css';
 import FacultyAdd from './components/FacultyAdd';
 import Home from './components/Home';
 import News from './components/News';
