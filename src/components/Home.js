@@ -33,7 +33,7 @@ const Home = () => {
         async function fetchTotalCount() {
             const facultyRef = collection(db, 'faculty');
             const studentRef = collection(db, 'student');
-            const newsRef = collection(db, 'news');
+            const newsRef = collection(db, 'annoucement');
             const [] = await Promise.all([
                 onSnapshot(facultyRef, (snap) => {
                     const count = snap.size;
