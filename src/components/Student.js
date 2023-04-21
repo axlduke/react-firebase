@@ -2,11 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react'
 import classNames from 'classnames'
 import { HiOutlineHome } from 'react-icons/hi'
 import { BsNewspaper } from 'react-icons/bs'
-import { FaUsers, FaUserGraduate, FaBars, FaEdit} from 'react-icons/fa'
-import { FiDelete } from 'react-icons/fi'
+import { FaUsers, FaUserGraduate, FaBars} from 'react-icons/fa'
+import { DataGrid } from "@mui/x-data-grid"
 import { IoIosLogOut, IoIosClose } from 'react-icons/io'
+import { Link } from "react-router-dom"
 import '../assets/Scrollbar.css'
-
+import { studentColumns } from './Data'
+import { collection, deleteDoc, getDocs, doc, onSnapshot } from 'firebase/firestore'
+import { db } from '../firebase'
 
 const links = [
     { name: 'Dashboard', icon: <HiOutlineHome />, link: '/' },
@@ -47,66 +50,69 @@ const Student = () => {
         }
     }, [isMobile])
 
+    const actionColumn = [
+        {
+            field: "action",
+            headerName: "Action",
+            width: 200,
+            renderCell: (params) => {
+                return (
+                <div className="cellAction">
+                    <Link to="/users/test" style={{ textDecoration: "none" }}>
+                    <div className="viewButton">View</div>
+                    </Link>
+                    <div
+                    className="deleteButton"
+                    onClick={() => handleDelete(params.row.id)}
+                    >
+                    Delete
+                    </div>
+                </div>
+                );
+            },
+        },
+    ];
 
+    const handleDelete = async(id) => {
+        try {
+            await deleteDoc(doc(db, 'student', id))
+            setData(data.filter((item) => item.id !== id))
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const data = [
-        { id: 1, name: 'John Doe', email: 'johndoe@example.com' },
-        { id: 2, name: 'Jane Smith', email: 'janesmith@example.com' },
-        { id: 3, name: 'Bob Johnson', email: 'bobjohnson@example.com' },
-        { id: 4, name: 'Sarah Lee', email: 'sarahlee@example.com' },
-        { id: 5, name: 'Chris Brown', email: 'chrisbrown@example.com' },
-        { id: 6, name: 'Taylor Swift', email: 'taylorswift@example.com' },
-        { id: 7, name: 'Justin Bieber', email: 'justinbieber@example.com' },
-        { id: 8, name: 'Adele', email: 'adele@example.com' },
-        { id: 9, name: 'Ed Sheeran', email: 'edsheeran@example.com' },
-        { id: 10, name: 'Shawn Mendes', email: 'shawnmendes@example.com' },
-        { id: 11, name: 'Dua Lipa', email: 'dualipa@example.com' },
-        { id: 12, name: 'Bruno Mars', email: 'brunomars@example.com' },
-        { id: 13, name: 'Ariana Grande', email: 'arianagrande@example.com' },
-        { id: 14, name: 'Lady Gaga', email: 'ladygaga@example.com' },
-        { id: 15, name: 'Beyoncé', email: 'beyonce@example.com' },
-        { id: 16, name: 'Kanye West', email: 'kanyewest@example.com' },
-        { id: 17, name: 'Drake', email: 'drake@example.com' },
-        { id: 18, name: 'Nicki Minaj', email: 'nickiminaj@example.com' },
-        { id: 19, name: 'Rihanna', email: 'rihanna@example.com' },
-        { id: 20, name: 'Katy Perry', email: 'katyperry@example.com' },
-    ]
+    const [ data, setData ] = useState([])
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [dataLimit, setDataLimit] = useState(10);
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const filteredData = useMemo(() => {
-        if (!searchTerm) return data;
-
-        return data.filter((item) =>
-        Object.values(item).some(
-            (value) => String(value).toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+    useEffect(() => {
+        // const fetchData = async () => {
+        //     let list = []
+        //     try {
+        //         const querySnapshot = await getDocs(collection(db, 'faculty'))
+        //         querySnapshot.forEach((doc) => {
+        //             list.push({ id: doc.id, ...doc.data() })
+        //         })
+        //         setData(list)
+        //     } catch(err) {
+        //         console.log(err)
+        //     }
+        // }
+        // fetchData()
+        const unsub = onSnapshot(collection(db, 'student'), (snapShot) =>{
+            let list = []
+            snapShot.docs.forEach((doc) => {
+                list.push({ id: doc.id, ...doc.data() })
+            })
+            setData(list)
+        }, 
+            (error) => {
+                console.log(error)
+            }
         )
-        );
-    }, [data, searchTerm]);
-
-    const pageCount = Math.ceil(filteredData.length / dataLimit);
-
-    const paginatedData = useMemo(() => {
-        const startIndex = (currentPage - 1) * dataLimit;
-        return filteredData.slice(startIndex, startIndex + dataLimit);
-    }, [currentPage, dataLimit, filteredData]);
-
-    const handlePageClick = (event) => {
-        setCurrentPage(Number(event.target.id));
-    };
-
-    const handleLimitChange = (event) => {
-        setDataLimit(Number(event.target.value));
-        setCurrentPage(1);
-    };
-
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
-        setCurrentPage(1);
-    };
+        return () => {
+            unsub()
+        }
+    },[])
 
 
     return (
@@ -146,84 +152,35 @@ const Student = () => {
                                 )}
                             </div>
                         </div>
-                        {links.map((link) => (
-                        <a  href={link.link}
-                            key={link.link}
-                            onClick={() => handleLinkClick(link.link)}
+                        {links.map((item, index) => (
+                            <Link key={index} to={item.link}
+                            onClick={() => handleLinkClick(item.link)}
                             className={classNames('flex items-center py-3 pl-5 hover:bg-gray-700', {
-                            'bg-gray-700 border-r-8 border-[#7551FF] text-[#886aff]': activeLink === link.link,
-                            })}
-                        >
-                            <span className="mr-3">{link.icon}</span>
-                            <span>{link.name}</span>
-                        </a>
+                            'bg-gray-700 border-r-8 border-[#7551FF] text-[#886aff]': activeLink === item.link,
+                            })}>
+                                <span className="mr-3">{item.icon}</span>
+                                <span>{item.name}</span>
+                            </Link>
                         ))}
                     </div>
                 </div>
             </div>
-            <div className="lg:ml-[300px] mt-28 lg:mt-20 2xl:mt-20 mx-2 w-full lg:mx-0 lg:w-full 2xl:w-[1220px] h-fit bg-white rounded-b-lg shadow-md">
-                <div className="flex justify-between place-content-center">
-                    <h1 className="text-2xl font-bold my-5 2xl:ml-10 text-[#886aff]">Faculty Lists</h1>
-                    <button className='mr-5'>
-                        {add.map((links) => (
-                        <a  href={links.link}
-                            className='p-2 border-2 border-[#7551FF] rounded-md'
-                        >
-                            Add New Stdudent
-                        </a>
-                        ))}
-                    </button>
-                </div>
-                <div className='flex justify-end justify-between mx-6 2xl:mx-10'>
-                    <input type="text" placeholder="Search" value={searchTerm} onChange={handleSearch} 
-                        className='w-72 p-2 border border-black outline-none rounded-md'
+            <div className='table'>
+                <div className="datatable">
+                    <div className="datatableTitle">
+                        Student List
+                        <Link to="/student_add" className="link">
+                            Add Student
+                        </Link>
+                    </div>
+                    <DataGrid
+                        className="datagrid"
+                        rows={data}
+                        columns={studentColumns}
+                        pageSize={9}
+                        rowsPerPageOptions={[9]}
+                        checkboxSelection
                     />
-                    <select 
-                        value={dataLimit} 
-                        onChange={handleLimitChange}
-                        className='border border-black px-auto rounded-md'
-                    >
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-                <table className='min-w-full table-auto overflow-x-auto mt-2'>
-                    <thead className='min-w-full table-auto'>
-                        <tr className='bg-gray-200 text-[#886aff] uppercase text-sm leading-normal"'>
-                            {Object.keys(data[0]).map((key) => (
-                            <th key={key} className="py-3 px-6 text-left">{key}</th>
-                            ))}
-                            <td className="flex gap-2 py-1 px-3 text-left">
-                                <button className="flex items-center border border-[#886aff] text-[#886aff] hover:bg-[#e1daff] transition delay-100 ease-in-out font-bold py-2 px-4 rounded">
-                                    <FaEdit/> Click me
-                                </button>
-                                <button className="flex items-center border border-red-500 text-red-500 hover:bg-red-100 transition delay-100 ease-in-out font-bold py-2 px-4 rounded">
-                                    <FiDelete/> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedData.map((item, index) => (
-                            <tr key={index} className="border-b border-gray-200 hover:bg-gray-100">
-                            {Object.values(item).map((value, index) => (
-                                <td key={index} className="py-3 px-3 text-left ">{value}</td>
-                            ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className='my-5 ml-10'>
-                    {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
-                        <button 
-                            key={page} 
-                            id={page} 
-                            onClick={handlePageClick}
-                            className='border border-indigo-200 w-10 p-1'>
-                            {page}
-                        </button>
-                    ))}
                 </div>
             </div>
         </div>

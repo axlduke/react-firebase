@@ -6,7 +6,7 @@ import { BsNewspaper } from 'react-icons/bs'
 import { FaUsers, FaUserGraduate, FaBars } from 'react-icons/fa'
 import { IoIosLogOut, IoIosClose } from 'react-icons/io'
 import '../assets/Scrollbar.css'
-import { userInputs } from '../FacultyformSource'
+import { userInputs } from '../formSource'
 import { doc, serverTimestamp, setDoc, addDoc, collection, docRef
 } from 'firebase/firestore'
 import { auth, db, storage } from '../firebase'

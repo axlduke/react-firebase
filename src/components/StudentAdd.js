@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import classNames from 'classnames'
+import './Button.css'
 import { HiOutlineHome } from 'react-icons/hi'
 import { BsNewspaper } from 'react-icons/bs'
 import { FaUsers, FaUserGraduate, FaBars } from 'react-icons/fa'
 import { IoIosLogOut, IoIosClose } from 'react-icons/io'
 import '../assets/Scrollbar.css'
-
+import { studentInputs } from '../formSource'
+import { doc, serverTimestamp, setDoc, addDoc, collection, docRef
+} from 'firebase/firestore'
+import { auth, db, storage } from '../firebase'
+// import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
+import { useNavigate } from 'react-router-dom'
 
 const links = [
     { name: 'Dashboard', icon: <HiOutlineHome />, link: '/' },
@@ -41,6 +48,87 @@ const StudentAdd = () => {
             localStorage.setItem('sidebarState', 'close')
         }
     }, [isMobile])
+
+    const [ data, setData ] = useState({})
+    const [ file, setFile ] = useState("")
+    const [ per, setPerc ] = useState(null)
+    const navigate = useNavigate()
+    // const [data, setData] = useState({ name: "", address: "", faculty: "" })
+
+    useEffect(() => {
+        const uploadFile = () => {
+            const name = new Date().getTime() + file.name //para ma prevent error pag multiple yun uploads ng images
+            // console.log(name)
+            const storageRef = ref(storage, file.name)
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on('state_changed', 
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                setPerc(progress)
+                switch (snapshot.state) {
+                case 'paused':
+                    console.log('Upload is paused');
+                    break;
+                case 'running':
+                    console.log('Upload is running');
+                    break;
+                    default:
+                        break
+                }
+            }, 
+            (error) => {
+                console.log(error)
+            }, 
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                // console.log('File available at', downloadURL);
+                    setData((prev)=> ({...prev, img:downloadURL}))
+                });
+            }
+            );
+        }
+        file && uploadFile()
+    },[file]) 
+    console.log(data)  
+
+    const handleInput = (e) => {
+        const id = e.target.id;
+        const value = e.target.value;
+        setData({ ...data, [id]:value });
+    };
+    
+    console.log(data)
+
+    const handleAdd = async(e) => {
+        e.preventDefault()
+        try {
+            const res = await (
+                auth,
+                data.name,
+                data.lrn,
+                data.gradeSection,
+                data.address,
+                data.adviser,
+                data.room
+            )
+            await addDoc(collection(db, "student"), {
+                ...data,
+                // timestamp: serverTimestamp(),
+            });
+            navigate(-1)
+            // const docRef = await addDoc(collection(db, "faculty"), {
+            //     ...data,
+            //     timestamp: serverTimestamp(),
+            // });
+            console.log("Data sent successfully to Firestore!");
+            // setData({ name: "", address: "", grade: "" });
+        } catch (err) {
+            console.log(err);
+        }
+
+    }
 
     return (
         <div className="my-scrollable-element bg-[#EDF1FA] h-full flex flex-row">
@@ -94,83 +182,53 @@ const StudentAdd = () => {
                     </div>
                 </div>
             </div>
-            <div className="lg:ml-52 mx-5 lg:mx-0 w-full h-screen">
-                <div class="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
-                    <div class="container max-w-screen-lg mx-auto">
+            <div className="lg:ml-72 mt-14 lg:mt-10 2xl:mt-0 2xl:ml-52 mx-5 lg:mx-0 w-full h-screen">
+                <div className="min-h-screen p-6 flex items-center justify-center">
+                    <div className="container max-w-screen-lg mx-auto">
                         <div>
-                        <h2 class="font-semibold text-xl text-gray-600">Student Form</h2>
-                        <p class="text-gray-500 mb-6">Form is to add new Student Information.</p>
+                        <h2 className="font-semibold text-xl text-gray-600">Student Form</h2>
+                        <p className="text-gray-500 mb-6">Form is to add new Student Information.</p>
 
-                        <div class="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
-                            <div class="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3">
-                            <div class="text-gray-600">
-                                <p class="font-medium text-lg">Personal Details</p>
+                        <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
+                            <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3">
+                            <div className="text-gray-600">
+                                <p className="font-medium text-lg">Personal Details</p>
                                 <p>Please fill out all the fields.</p>
                                 <div className=''>
-                                    <img src='https://fapachi.com/models/h/a/hayami-haru/1/full/hayami-haru_0034.jpeg' 
+                                    <img src={
+                                            file ? URL.createObjectURL(file) : 'https://www.nicepng.com/png/detail/73-730154_open-default-profile-picture-png.png'
+                                        } 
                                         alt='profile'
-                                        className='w-72 aspect-square rounded-md'/>
+                                        className='w-72 aspect-square border border-black rounded-md'/>
                                 </div>
                             </div>
                             
                             <div class="lg:col-span-2 lg:mt-10 2xl:mt-10">
-                                <form>
-                                    <div class="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-5">
-                                        <div class="md:col-span-3">
-                                            <label for="address">Full Name</label>
-                                            <input type="text" name="address" id="address" class="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="" />
+                                <form onSubmit={handleAdd}>
+                                    <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-5">
+                                        {studentInputs.map((input) => (
+                                            <div className="md:col-span-2" key={input.id}>
+                                                <label>{input.label}</label>
+                                                <input  
+                                                    id={input.id}
+                                                    type={input.type} 
+                                                    className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" 
+                                                    placeholder={input.placeholder} onChange={handleInput}/>
+                                            </div>
+                                        ))}
+                                        <div className="md:col-span-2">
+                                            <label>Upload Image</label>
+                                            <input  
+                                                type="file" 
+                                                className="h-10 border mt-1 rounded px-4 w-full bg-gray-50" 
+                                                onChange={(e) => setFile(e.target.files[0])}    
+                                            />
                                         </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="city">LRN</label>
-                                            <input type="number" class="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="" />
-                                        </div>
-
-                                        <div class="md:col-span-3">
-                                            <label for="address">Address / Street</label>
-                                            <input type="text" name="address" id="address" class="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="" />
-                                        </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="city">City</label>
-                                            <input type="text" name="city" id="city" class="h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="" />
-                                        </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="country">Monday</label>
-                                            <div class="h-10 bg-gray-50 flex border border-gray-200 rounded items-center mt-1">
-                                            <input name="country" type="time" placeholder="Time" class="px-4 appearance-none outline-none text-gray-800 w-full bg-transparent" />
+                                        <div className="md:col-span-5 text-right">
+                                            <div className="inline-flex items-end">
+                                                <button type='submit' disabled={per !== null && per < 100 } className="bg-[#7551FF] hover:bg-[#6843ff] text-white font-bold py-2 px-4 rounded">Submit</button>
                                             </div>
                                         </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="state">Tuesday</label>
-                                            <div class="h-10 bg-gray-50 flex border border-gray-200 rounded items-center mt-1">
-                                                <input name="state" type="time" placeholder="Time" class="px-4 appearance-none outline-none text-gray-800 w-full bg-transparent" />
-                                            </div>
-                                        </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="zipcode">Wednesday</label>
-                                            <input type="time" name="zipcode" id="zipcode" class="transition-all flex items-center h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="Time" />
-                                        </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="zipcode">Thursday</label>
-                                            <input type="time" name="zipcode" id="zipcode" class="transition-all flex items-center h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="Time" />
-                                        </div>
-
-                                        <div class="md:col-span-2">
-                                            <label for="zipcode">Friday</label>
-                                            <input type="time" name="zipcode" id="zipcode" class="transition-all flex items-center h-10 border mt-1 rounded px-4 w-full bg-gray-50" placeholder="Time" />
-                                        </div>
-
-                                        <div class="md:col-span-5 text-right">
-                                            <div class="inline-flex items-end">
-                                            <button class="bg-[#7551FF] hover:bg-[#6843ff] text-white font-bold py-2 px-4 rounded">Submit</button>
-                                            </div>
-                                        </div>
-
                                     </div>
                                 </form>
                             </div>

@@ -6,7 +6,7 @@ import { FaUsers, FaUserGraduate, FaBars, FaEdit } from 'react-icons/fa'
 import { FiDelete } from 'react-icons/fi'
 import { IoIosLogOut, IoIosClose } from 'react-icons/io'
 import '../assets/Scrollbar.css'
-
+import { Link } from "react-router-dom"
 
 const links = [
     { name: 'Dashboard', icon: <HiOutlineHome />, link: '/' },
@@ -146,17 +146,15 @@ const Faculty = () => {
                                 )}
                             </div>
                         </div>
-                        {links.map((link) => (
-                        <a  href={link.link}
-                            key={link.link}
-                            onClick={() => handleLinkClick(link.link)}
+                        {links.map((item, index) => (
+                            <Link key={index} to={item.link}
+                            onClick={() => handleLinkClick(item.link)}
                             className={classNames('flex items-center py-3 pl-5 hover:bg-gray-700', {
-                            'bg-gray-700 border-r-8 border-[#7551FF] text-[#886aff]': activeLink === link.link,
-                            })}
-                        >
-                            <span className="mr-3">{link.icon}</span>
-                            <span>{link.name}</span>
-                        </a>
+                            'bg-gray-700 border-r-8 border-[#7551FF] text-[#886aff]': activeLink === item.link,
+                            })}>
+                                <span className="mr-3">{item.icon}</span>
+                                <span>{item.name}</span>
+                            </Link>
                         ))}
                     </div>
                 </div>
