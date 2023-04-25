@@ -108,9 +108,11 @@ const StudentAdd = () => {
                 auth,
                 data.name,
                 data.lrn,
-                data.gradeSection,
+                data.guardianname,
+                data.guardiancontact,
                 data.address,
                 data.adviser,
+                data.gradeSection,
                 data.room
             )
             await addDoc(collection(db, "student"), {

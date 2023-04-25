@@ -69,10 +69,16 @@ export const studentInputs = [
         placeholder: "input the 11 LRN digits",
     },
     {
-        id: "gradeSection",
-        label: "Grade & Section",
+        id: "guardianname",
+        label: "Guardian Name",
         type: "text",
-        placeholder: "Grade 6 Newton",
+        placeholder: "James Bo",
+    },
+    {
+        id: "guardiancontact",
+        label: "Guardian Contact",
+        type: "text",
+        placeholder: "09876543211",
     },
     {
         id: "address",
